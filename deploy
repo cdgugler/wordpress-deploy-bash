@@ -26,6 +26,8 @@
 #       deploy files to production (remove 'go' for dry run)
 # Use deploy pull to pull from production to dev.
 
+source ./deploy.cfg
+
 if [ $# -eq 0 ]; then
     # no arguments passed in, show usage
     echo $ERRORSTRING;
