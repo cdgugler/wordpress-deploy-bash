@@ -13,7 +13,21 @@ PARAMETERS:
     "
 }
 function add_environment() {
-    echo "Adding environment..."
+    echo -n "Enter the name of the new environment: "
+    read env_name
+    declare -A ${env_name}
+    echo "declare -A ${env_name}"
+    echo -n "Enter user name: "
+    read env_user_name
+    echo "env_user_name is ${env_user_name}"
+    # eval to force bash to evaluate the assignment and not try to execute it
+    echo ${env_name}[user_name]=${env_user_name}
+    eval ${env_name}[user_name]=${env_user_name}
+    echo "Adding environment $env_name"
+    # eval again to evaluate command substitution
+    # escape first $ to prevent parameter expansion to echo
+    eval echo \${$env_name[@]}
+    # echo "User name is: ${${env_name}[user_name]}"
     exit
 }
 function deploy_files() {
