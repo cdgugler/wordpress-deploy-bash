@@ -16,6 +16,9 @@ function add_environment() {
     echo "Adding environment..."
     exit
 }
+function deploy_files() {
+    echo "Deploying files from $ARG1 to $ARG2"
+}
 
 if [[ "$1" =~ ^((-{1,2})([Hh]$|[Hh][Ee][Ll][Pp])|)$ ]]; then
     print_usage; exit 1
@@ -39,4 +42,8 @@ else
     ARG2=${2^^}
     echo "FROM: " $ARG1
     echo "TO: " $ARG2
+
+    if [ "$DEPLOY_FILES" = true ] ; then
+        deploy_files
+    fi
 fi
