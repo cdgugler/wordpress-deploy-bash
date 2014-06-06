@@ -17,7 +17,17 @@ function add_environment() {
     exit
 }
 function deploy_files() {
+    check_dry_run ;
     echo "Deploying files from $ARG1 to $ARG2"
+}
+function deploy_database() {
+    check_dry_run ;
+    echo "Deploying database from $ARG1 to $ARG2"
+}
+function check_dry_run() {
+    if [ "$DEPLOY_DRY_RUN" = true ] ; then
+        echo "********** DRY RUN **********"
+    fi
 }
 
 if [[ "$1" =~ ^((-{1,2})([Hh]$|[Hh][Ee][Ll][Pp])|)$ ]]; then
@@ -45,5 +55,9 @@ else
 
     if [ "$DEPLOY_FILES" = true ] ; then
         deploy_files
+    fi
+
+    if [ "$DEPLOY_DATABASE" = true ] ; then
+        deploy_database
     fi
 fi
