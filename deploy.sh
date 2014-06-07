@@ -16,18 +16,58 @@ function add_environment() {
     echo -n "Enter the name of the new environment: "
     read env_name
     declare -A ${env_name}
-    echo "declare -A ${env_name}"
+
     echo -n "Enter user name: "
     read env_user_name
-    echo "env_user_name is ${env_user_name}"
     # eval to force bash to evaluate the assignment and not try to execute it
-    echo ${env_name}[user_name]=${env_user_name}
     eval ${env_name}[user_name]=${env_user_name}
-    echo "Adding environment $env_name"
+
+    echo -n "Enter server address[server.com]: "
+    read env_server_name
+    eval ${env_name}[server_name]=${env_server_name}
+
+    echo -n "Enter DB name: "
+    read env_db_name
+    eval ${env_name}[db_name]=${env_db_name}
+
+    echo -n "Enter DB user name: "
+    read env_db_user
+    eval ${env_name}[db_user]=${env_db_user}
+
+    echo -n "Enter DB password: "
+    read env_db_password
+    eval ${env_name}[db_password]=${env_db_password}
+
+    echo -n "Enter directory: "
+    read env_directory
+    eval ${env_name}[db_directory]="${env_directory}"
+
+    echo -n "Enter sql host[localhost]: "
+    read env_sql
+    eval ${env_name}[sql_host]=${env_sql}
+
+    echo "**********************************"
+    echo "Confirm new environment: $env_name"
     # eval again to evaluate command substitution
     # escape first $ to prevent parameter expansion to echo
-    eval echo \${$env_name[@]}
-    # echo "User name is: ${${env_name}[user_name]}"
+    # eval echo \${$env_name[@]}
+    
+    echo -n "User name: "
+    eval echo \${$env_name[user_name]}
+    echo -n "Server name: "
+    eval echo \${$env_name[server_name]}
+    echo -n "Database name: "
+    eval echo \${$env_name[db_name]}
+    echo -n "Database user name: "
+    eval echo \${$env_name[db_user]}
+    echo -n "Database password: "
+    eval echo \${$env_name[db_password]}
+    echo -n "Database directory: "
+    eval echo \${$env_name[db_directory]}
+    echo -n "Database sql host: "
+    eval echo \${$env_name[sql_host]}
+
+
     exit
 }
 function deploy_files() {
