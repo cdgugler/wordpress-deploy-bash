@@ -66,7 +66,25 @@ function add_environment() {
     eval echo \${$env_name[db_directory]}
     echo -n "Database sql host: "
     eval echo \${$env_name[sql_host]}
+    
+    read -p "Write to deploy.cfg? [Y/n] " -n 1 -r
+    echo
+    if [[ $REPLY =~ ^[Yy]$ ]]
+    then
+        echo "########## $env_name ##########" >> deploy.cfg
+        echo declare -A ${env_name} >> deploy.cfg
+        echo ${env_name}[user_name]=${env_user_name} >> deploy.cfg
+        echo ${env_name}[server_name]=${env_server_name} >> deploy.cfg
+        echo ${env_name}[db_name]=${env_db_name} >> deploy.cfg
+        echo ${env_name}[db_user]=${env_db_user} >> deploy.cfg
+        echo ${env_name}[db_password]=${env_db_password} >> deploy.cfg
+        echo ${env_name}[db_directory]="${env_directory}" >> deploy.cfg
+        echo ${env_name}[sql_host]=${env_sql} >> deploy.cfg
 
+        echo "$env_name added."
+        exit
+    fi
+    echo "Cancelled."
 
     exit
 }
