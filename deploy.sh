@@ -46,6 +46,11 @@ function add_environment() {
     read env_sql
     eval ${env_name}[sql_host]=${env_sql}
 
+    echo -n "Development server? [Y/n] "
+    read env_dev
+    env_sql=${env_dev^^}
+    eval ${env_name}[development]=${env_dev}
+
     echo "**********************************"
     echo "Confirm new environment: $env_name"
     # eval again to evaluate command substitution
@@ -66,6 +71,8 @@ function add_environment() {
     eval echo \${$env_name[db_directory]}
     echo -n "Database sql host: "
     eval echo \${$env_name[sql_host]}
+    echo -n "Development Environment? "
+    eval echo \${$env_name[development]}
     
     read -p "Write to deploy.cfg? [Y/n] " -n 1 -r
     echo
@@ -78,7 +85,7 @@ function add_environment() {
         echo ${env_name}[db_name]=${env_db_name} >> deploy.cfg
         echo ${env_name}[db_user]=${env_db_user} >> deploy.cfg
         echo ${env_name}[db_password]=${env_db_password} >> deploy.cfg
-        echo ${env_name}[db_directory]="${env_directory}" >> deploy.cfg
+        echo ${env_name}[directory]="${env_directory}" >> deploy.cfg
         echo ${env_name}[sql_host]=${env_sql} >> deploy.cfg
 
         echo "$env_name added."
@@ -90,7 +97,20 @@ function add_environment() {
 }
 function deploy_files() {
     check_dry_run ;
-    echo "Deploying files from $ARG1 to $ARG2"
+    # echo "Deploying files from $ARG1 to $ARG2"
+    eval echo "Deploying files from \${$ARG1[server_name]} to \${$ARG2[server_name]}"
+    # eval echo "dev is \${$ARG1[development]}"
+    eval temp=\${$ARG1[development]}
+    eval temp2=\${$ARG2[development]}
+
+    if [ $temp == "Y" ] ; then
+        eval rsync --dry-run -arvus --progress \${$ARG1[directory]} \${$ARG2[user_name]}@\${$ARG2[server_name]}:\${$ARG2[directory]}
+    elif [ $temp2 == "Y" ] ; then
+        eval rsync --dry-run -arvus --progress \${$ARG1[user_name]}@\${$ARG1[server_name]}:\${$ARG1[directory]} \${$ARG2[directory]}
+    else
+        echo "Error. No local server."
+        exit 1
+    fi
 }
 function deploy_database() {
     check_dry_run ;
@@ -122,8 +142,10 @@ else
     # convert args to uppercase
     ARG1=${1^^}
     ARG2=${2^^}
-    echo "FROM: " $ARG1
-    echo "TO: " $ARG2
+
+    source ./deploy.cfg
+    # echo "FROM: " $ARG1
+    # echo "TO: " $ARG2
 
     if [ "$DEPLOY_FILES" = true ] ; then
         deploy_files
