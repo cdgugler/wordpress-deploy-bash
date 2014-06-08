@@ -99,7 +99,7 @@ function add_environment() {
 function deploy_files() {
     check_dry_run ;
     # echo "Deploying files from $ARG1 to $ARG2"
-    eval echo "Deploying files from \${$ARG1[server_name]} to \${$ARG2[server_name]}"
+    eval echo Deploying files from \${$ARG1[server_name]} to \${$ARG2[server_name]}
     deploy_silent ;
     # eval echo "dev is \${$ARG1[development]}"
     eval temp=\${$ARG1[development]}
@@ -133,11 +133,22 @@ function check_dry_run() {
 }
 function deploy_silent() {
     if [ "$DEPLOY_SILENT" != true ] ; then
+        read -p "Continue? " -n 1 -r
+        echo
+        # matches if not Y/y
+        if [[ $REPLY =~ ^[^Yy]$ ]] ; then
+            exit
+        fi
+    fi
+}
+function check_for_servers() {
+    if [ "$ARG1" = "" ] || [ "$ARG2" = "" ] ; then
+        print_usage ; exit 1
     fi
 }
 
 if [[ "$1" =~ ^((-{1,2})([Hh]$|[Hh][Ee][Ll][Pp])|)$ ]]; then
-    print_usage; exit 1
+    print_usage ; exit 1
 else
     # Parse arguments
     while getopts ":afdns" opt; do
@@ -160,6 +171,11 @@ else
     source ./deploy.cfg
     # echo "FROM: " $ARG1
     # echo "TO: " $ARG2
+
+    check_for_servers
+
+    eval echo \${$ARG1[server_name]}
+    # eval echo Deploying files from \${$ARG1[server_name]} to \${$ARG2[server_name]}
 
     if [ "$DEPLOY_FILES" = true ] ; then
         deploy_files
