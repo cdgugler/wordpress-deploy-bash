@@ -2,8 +2,8 @@
 function print_usage() {
     echo "deploy.sh
 
-DESCRIPTION: Deploy files and/or database for wordpress installation.
 USAGE: deploy.sh <origin> <destination>
+DESCRIPTION: Deploy files and/or database for wordpress installation.
 PARAMETERS:
     -a  Add new environment
     -f  Deploy files
@@ -12,6 +12,8 @@ PARAMETERS:
     -s  Silent
     "
 }
+
+# Add new environment to config file
 function add_environment() {
     echo -n "Enter the name of the new environment: "
     read env_name
@@ -76,8 +78,7 @@ function add_environment() {
     
     read -p "Write to deploy.cfg? [Y/n] " -n 1 -r
     echo
-    if [[ $REPLY =~ ^[Yy]$ ]]
-    then
+    if [[ $REPLY =~ ^[Yy]$ ]] ; then
         echo "########## $env_name ##########" >> deploy.cfg
         echo declare -A ${env_name} >> deploy.cfg
         echo ${env_name}[user_name]=${env_user_name} >> deploy.cfg
@@ -88,7 +89,6 @@ function add_environment() {
         echo ${env_name}[directory]="${env_directory}" >> deploy.cfg
         echo ${env_name}[sql_host]=${env_sql} >> deploy.cfg
         echo ${env_name}[development]=${env_dev} >> deploy.cfg
-
         echo "$env_name added."
         exit
     fi
@@ -96,6 +96,8 @@ function add_environment() {
 
     exit
 }
+
+# Move files from one environment to another with rsync
 function deploy_files() {
     check_dry_run ;
     # echo "Deploying files from $ARG1 to $ARG2"
@@ -143,6 +145,8 @@ function deploy_silent() {
         fi
     fi
 }
+
+# Verify servers passed in as args and exist in config file
 function check_for_servers() {
     if [ "$ARG1" = "" ] || [ "$ARG2" = "" ] ; then
         print_usage ; exit 1
@@ -156,6 +160,7 @@ function check_for_servers() {
     fi
 }
 
+# Start script
 if [[ "$1" =~ ^((-{1,2})([Hh]$|[Hh][Ee][Ll][Pp])|)$ ]]; then
     print_usage ; exit 1
 else
