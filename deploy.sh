@@ -17,6 +17,8 @@ PARAMETERS:
 function add_environment() {
     echo -n "Enter the name of the new environment: "
     read env_name
+    env_name=${env_name^^}
+
     declare -A ${env_name}
 
     echo -n "Enter user name: "
@@ -50,8 +52,12 @@ function add_environment() {
 
     echo -n "Development server? [Y/n] "
     read env_dev
-    env_sql=${env_dev^^}
+    env_dev=${env_dev^^}
     eval ${env_name}[development]=${env_dev}
+
+    echo -n "Exclude files: "
+    read env_exclude
+    eval ${env_name}[exclude]=${env_exclude}
 
     echo "**********************************"
     echo "Confirm new environment: $env_name"
@@ -75,6 +81,8 @@ function add_environment() {
     eval echo \${$env_name[sql_host]}
     echo -n "Development Environment? "
     eval echo \${$env_name[development]}
+    echo -n "Exclude files: "
+    eval echo \${$env_name[exclude]}
     
     read -p "Write to deploy.cfg? [Y/n] " -n 1 -r
     echo
@@ -89,6 +97,7 @@ function add_environment() {
         echo ${env_name}[directory]="${env_directory}" >> deploy.cfg
         echo ${env_name}[sql_host]=${env_sql} >> deploy.cfg
         echo ${env_name}[development]=${env_dev} >> deploy.cfg
+        echo ${env_name}[exclude]=${env_exclude} >> deploy.cfg
         echo "$env_name added."
         exit
     fi
