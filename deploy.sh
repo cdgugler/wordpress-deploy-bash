@@ -87,6 +87,7 @@ function add_environment() {
         echo ${env_name}[db_password]=${env_db_password} >> deploy.cfg
         echo ${env_name}[directory]="${env_directory}" >> deploy.cfg
         echo ${env_name}[sql_host]=${env_sql} >> deploy.cfg
+        echo ${env_name}[development]=${env_dev} >> deploy.cfg
 
         echo "$env_name added."
         exit
@@ -99,14 +100,23 @@ function deploy_files() {
     check_dry_run ;
     # echo "Deploying files from $ARG1 to $ARG2"
     eval echo "Deploying files from \${$ARG1[server_name]} to \${$ARG2[server_name]}"
+    deploy_silent ;
     # eval echo "dev is \${$ARG1[development]}"
     eval temp=\${$ARG1[development]}
     eval temp2=\${$ARG2[development]}
 
     if [ $temp == "Y" ] ; then
-        eval rsync --dry-run -arvus --progress \${$ARG1[directory]} \${$ARG2[user_name]}@\${$ARG2[server_name]}:\${$ARG2[directory]}
+        if [ "$DEPLOY_DRY_RUN" = true ] ; then
+            eval rsync --dry-run -arvus --progress \${$ARG1[directory]} \${$ARG2[user_name]}@\${$ARG2[server_name]}:\${$ARG2[directory]}
+        else
+            eval rsync -arvus --progress \${$ARG1[directory]} \${$ARG2[user_name]}@\${$ARG2[server_name]}:\${$ARG2[directory]}
+        fi
     elif [ $temp2 == "Y" ] ; then
-        eval rsync --dry-run -arvus --progress \${$ARG1[user_name]}@\${$ARG1[server_name]}:\${$ARG1[directory]} \${$ARG2[directory]}
+        if [ "$DEPLOY_DRY_RUN" = true ] ; then
+            eval rsync --dry-run -arvus --progress \${$ARG1[user_name]}@\${$ARG1[server_name]}:\${$ARG1[directory]} \${$ARG2[directory]}
+        else
+            eval rsync -arvus --progress \${$ARG1[user_name]}@\${$ARG1[server_name]}:\${$ARG1[directory]} \${$ARG2[directory]}
+        fi
     else
         echo "Error. No local server."
         exit 1
@@ -119,6 +129,10 @@ function deploy_database() {
 function check_dry_run() {
     if [ "$DEPLOY_DRY_RUN" = true ] ; then
         echo "********** DRY RUN **********"
+    fi
+}
+function deploy_silent() {
+    if [ "$DEPLOY_SILENT" != true ] ; then
     fi
 }
 
