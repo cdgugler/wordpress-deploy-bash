@@ -124,15 +124,22 @@ function deploy_files() {
         exit 1
     fi
 }
+
+# Move database between environments
 function deploy_database() {
     check_dry_run ;
     echo "Deploying database from $ARG1 to $ARG2"
 }
+
+# Display dry run message if applicable
 function check_dry_run() {
     if [ "$DEPLOY_DRY_RUN" = true ] ; then
         echo "********** DRY RUN **********"
     fi
 }
+
+
+# Ask for confirmation if not deploying silently
 function deploy_silent() {
     if [ "$DEPLOY_SILENT" != true ] ; then
         read -p "Continue? " -n 1 -r
