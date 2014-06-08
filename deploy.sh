@@ -55,7 +55,7 @@ function add_environment() {
     env_dev=${env_dev^^}
     eval ${env_name}[development]=${env_dev}
 
-    echo -n "Exclude files: "
+    echo -n "Exclude files(surround with single quotes): "
     read env_exclude
     eval ${env_name}[exclude]=${env_exclude}
 
@@ -118,15 +118,15 @@ function deploy_files() {
 
     if [ $temp == "Y" ] ; then
         if [ "$DEPLOY_DRY_RUN" = true ] ; then
-            eval rsync --dry-run -arvus --progress \${$ARG1[directory]} \${$ARG2[user_name]}@\${$ARG2[server_name]}:\${$ARG2[directory]}
+            eval rsync --dry-run -arvus --progress \${$ARG1[directory]} \${$ARG2[user_name]}@\${$ARG2[server_name]}:\${$ARG2[directory]} \${$ARG1[exclude]}
         else
-            eval rsync -arvus --progress \${$ARG1[directory]} \${$ARG2[user_name]}@\${$ARG2[server_name]}:\${$ARG2[directory]}
+            eval rsync -arvus --progress \${$ARG1[directory]} \${$ARG2[user_name]}@\${$ARG2[server_name]}:\${$ARG2[directory]} \${$ARG1[exclude]}
         fi
     elif [ $temp2 == "Y" ] ; then
         if [ "$DEPLOY_DRY_RUN" = true ] ; then
-            eval rsync --dry-run -arvus --progress \${$ARG1[user_name]}@\${$ARG1[server_name]}:\${$ARG1[directory]} \${$ARG2[directory]}
+            eval rsync --dry-run -arvus --progress \${$ARG1[user_name]}@\${$ARG1[server_name]}:\${$ARG1[directory]} \${$ARG2[directory]} \${$ARG1[exclude]}
         else
-            eval rsync -arvus --progress \${$ARG1[user_name]}@\${$ARG1[server_name]}:\${$ARG1[directory]} \${$ARG2[directory]}
+            eval rsync -arvus --progress \${$ARG1[user_name]}@\${$ARG1[server_name]}:\${$ARG1[directory]} \${$ARG2[directory]} \${$ARG1[exclude]}
         fi
     else
         echo "Error. No local server."
