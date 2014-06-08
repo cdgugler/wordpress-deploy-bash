@@ -136,7 +136,9 @@ function deploy_silent() {
         read -p "Continue? " -n 1 -r
         echo
         # matches if not Y/y
-        if [[ $REPLY =~ ^[^Yy]$ ]] ; then
+        if [[ $REPLY =~ ^[Yy]$ ]] ; then
+            echo "Alright, let's do it!"
+        else
             exit
         fi
     fi
