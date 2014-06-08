@@ -145,6 +145,13 @@ function check_for_servers() {
     if [ "$ARG1" = "" ] || [ "$ARG2" = "" ] ; then
         print_usage ; exit 1
     fi
+    eval local server1=\${$ARG1[server_name]}
+    eval local server2=\${$ARG2[server_name]}
+
+    if [ "$server1" = "" ] || [ "$server2" = "" ] ; then
+        echo "Server not found, check deploy.cfg or add environment"
+        exit
+    fi
 }
 
 if [[ "$1" =~ ^((-{1,2})([Hh]$|[Hh][Ee][Ll][Pp])|)$ ]]; then
@@ -173,9 +180,6 @@ else
     # echo "TO: " $ARG2
 
     check_for_servers
-
-    eval echo \${$ARG1[server_name]}
-    # eval echo Deploying files from \${$ARG1[server_name]} to \${$ARG2[server_name]}
 
     if [ "$DEPLOY_FILES" = true ] ; then
         deploy_files
