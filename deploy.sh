@@ -20,70 +20,30 @@ function add_environment() {
     read env_name
     env_name=${env_name^^}
 
-    declare -A ${env_name}
-
-    echo -n "Enter user name: "
-    read env_user_name
-    # eval to force bash to evaluate the assignment and not try to execute it
-    eval ${env_name}[user_name]=${env_user_name}
-
-    echo -n "Enter server address[server.com]: "
-    read env_server_name
-    eval ${env_name}[server_name]=${env_server_name}
-
-    echo -n "Enter DB name: "
-    read env_db_name
-    eval ${env_name}[db_name]=${env_db_name}
-
-    echo -n "Enter DB user name: "
-    read env_db_user
-    eval ${env_name}[db_user]=${env_db_user}
-
-    echo -n "Enter DB password: "
-    read env_db_password
-    eval ${env_name}[db_password]=${env_db_password}
-
-    echo -n "Enter directory: "
-    read env_directory
-    eval ${env_name}[db_directory]="${env_directory}"
-
-    echo -n "Enter sql host[localhost]: "
-    read env_sql
-    eval ${env_name}[sql_host]=${env_sql}
-
-    echo -n "Development server? [Y/n] "
-    read env_dev
+    read -p "Enter user name: " env_user_name
+    read -p "Enter server address[server.com]: " env_server_name
+    read -p "Enter DB name: " env_db_name
+    read -p "Enter DB user name: " env_db_user
+    read -p "Enter DB password: " env_db_password
+    read -p "Enter directory: " env_directory
+    read -p "Enter sql host[localhost]: " env_sql
+    read -p "Development server? [Y/n] " env_dev
+    # uppercase convert
     env_dev=${env_dev^^}
-    eval ${env_name}[development]=${env_dev}
-
-    echo -n "Exclude files(surround with single quotes): "
-    read env_exclude
-    eval ${env_name}[exclude]=${env_exclude}
+    read -p "Exclude files(surround with single quotes): " env_exclude
 
     echo "**********************************"
     echo "Confirm new environment: $env_name"
-    # eval again to evaluate command substitution
-    # escape first $ to prevent parameter expansion to echo
-    # eval echo \${$env_name[@]}
     
-    echo -n "User name: "
-    eval echo \${$env_name[user_name]}
-    echo -n "Server name: "
-    eval echo \${$env_name[server_name]}
-    echo -n "Database name: "
-    eval echo \${$env_name[db_name]}
-    echo -n "Database user name: "
-    eval echo \${$env_name[db_user]}
-    echo -n "Database password: "
-    eval echo \${$env_name[db_password]}
-    echo -n "Database directory: "
-    eval echo \${$env_name[db_directory]}
-    echo -n "Database sql host: "
-    eval echo \${$env_name[sql_host]}
-    echo -n "Development Environment? "
-    eval echo \${$env_name[development]}
-    echo -n "Exclude files: "
-    eval echo \${$env_name[exclude]}
+    echo "User name: $env_user_name"
+    echo "Server name: $env_server_name"
+    echo "Database name: $env_db_name"
+    echo "Database user name: $env_db_user"
+    echo "Database password: $env_db_password"
+    echo "Database directory: $env_directory"
+    echo "Database sql host: $env_sql"
+    echo "Development Environment? $env_dev"
+    echo "Exclude files: $env_exclude"
     
     read -p "Write to deploy.cfg? [Y/n] " -n 1 -r
     echo
