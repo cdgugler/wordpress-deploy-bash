@@ -1,16 +1,17 @@
 #!/bin/bash
-function print_usage() {
-    echo "deploy.sh
 
-USAGE: deploy.sh <origin> <destination>
-DESCRIPTION: Deploy files and/or database for wordpress installation.
-PARAMETERS:
-    -a  Add new environment
-    -f  Deploy files
-    -d  Deploy database
-    -n  Dry run
-    -s  Silent
-    "
+# Print usage instructions
+function print_usage() {
+    cat <<- EOF
+USAGE: deploy.sh <options> origin destination
+DESCRIPTION: Deploy files and/or database from origin environment to destination
+OPTIONS:
+    -a  Add new environment         create new environment in deploy.cfg
+    -f  Deploy files                push files from origin to destination
+    -d  Deploy database             push db from origin to destination
+    -n  Dry run                     show result of operation without executing
+    -s  Silent                      don't ask for confirmation
+EOF
 }
 
 # Add new environment to config file
