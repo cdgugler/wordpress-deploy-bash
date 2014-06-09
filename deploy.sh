@@ -118,7 +118,10 @@ function deploy_database() {
         # second arg is the local environment
         if [ "$DEPLOY_DRY_RUN" = true ] ; then
             # back up local db
-            echo "Back up local db"
+            # create sql dir if not exist
+            mkdir -p ./sql
+            eval local backup_file_name=./sql/\${$ARG2[server_name]}-$(date +%Y%m%d_%H%M).sql
+            eval mysqldump -u \${$ARG2[db_user]} -p\${$ARG2[db_password]} -h \${$ARG2[sql_host]} \${$ARG2[db_name]} > $backup_file_name
         else
             echo "Not dry run."
         fi
