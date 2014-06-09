@@ -106,29 +106,39 @@ function deploy_database() {
     if [ $temp == "Y" ] ; then
         # first arg is the local environment
         if [ "$DEPLOY_DRY_RUN" = true ] ; then
-            ### back up remote db
-            # create sql dir if not exist
-            mkdir -p ./sql
-            eval local backup_file_name=./sql/\${$ARG2[server_name]}-$(date +%Y%m%d_%H%M).sql
-            eval ssh \${$ARG2[user_name]}@\${$ARG2[server_name]} \"mysqldump -u \${$ARG2[db_user]} -p\${$ARG2[db_password]} -h \${$ARG2[sql_host]} \${$ARG2[db_name]}\" > $backup_file_name
+            backup_remote_db
         else
-            echo "Not dry run."
+            backup_remote_db
         fi
     elif [ $temp2 == "Y" ] ; then
         # second arg is the local environment
         if [ "$DEPLOY_DRY_RUN" = true ] ; then
-            # back up local db
-            # create sql dir if not exist
-            mkdir -p ./sql
-            eval local backup_file_name=./sql/\${$ARG2[server_name]}-$(date +%Y%m%d_%H%M).sql
-            eval mysqldump -u \${$ARG2[db_user]} -p\${$ARG2[db_password]} -h \${$ARG2[sql_host]} \${$ARG2[db_name]} > $backup_file_name
+            backup_local_db
         else
-            echo "Not dry run."
+            backup_local_db
         fi
     else
         echo "Error. No local server."
         exit 1
     fi
+}
+
+# Back up local db
+function backup_local_db() {
+    # back up local db
+    # create sql dir if not exist
+    mkdir -p ./sql
+    eval local backup_file_name=./sql/\${$ARG2[server_name]}-$(date +%Y%m%d_%H%M).sql
+    eval mysqldump -u \${$ARG2[db_user]} -p\${$ARG2[db_password]} -h \${$ARG2[sql_host]} \${$ARG2[db_name]} > $backup_file_name
+}
+
+# Back up remote db
+function backup_remote_db() {
+    ### back up remote db
+    # create sql dir if not exist
+    mkdir -p ./sql
+    eval local backup_file_name=./sql/\${$ARG2[server_name]}-$(date +%Y%m%d_%H%M).sql
+    eval ssh \${$ARG2[user_name]}@\${$ARG2[server_name]} \"mysqldump -u \${$ARG2[db_user]} -p\${$ARG2[db_password]} -h \${$ARG2[sql_host]} \${$ARG2[db_name]}\" > $backup_file_name
 }
 
 # Display dry run message if applicable
