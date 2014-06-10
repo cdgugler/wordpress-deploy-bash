@@ -109,6 +109,16 @@ function deploy_database() {
             backup_remote_db
         else
             backup_remote_db
+            eval mysqldump -u \${$ARG1[db_user]} -p\${$ARG1[db_password]} \${$ARG1[db_name]} | ssh \${$ARG2[user_name]}@\${$ARG2[server_name]} \"mysql -u \${$ARG2[db_user]} -p\${$ARG2[db_password]} -h \${$ARG2[sql_host]} \${$ARG2[db_name]}\"
+            check_for_search_replace
+            # scp ./Search-Replace-DB-master/searchreplacedb2cli.php ./Search-Replace-DB-master/searchreplacedb2.php $PRODUSER@$PRODSERVER:$PRODDIR
+            # echo "Running Search replace on production DB"
+            # # Heredoc to run multiple commands
+            # ssh $PRODUSER@$PRODSERVER <<SYNCITREMOTE
+            # $PRODDIR$SEARCHREPLACE -h $PRODSQLHOST -u $PRODDBUSER -p $PRODDBPASS -d $PRODDBNAME -c utf8 -s "$DEVSERVER" -r "$PRODSERVER"
+            # rm $PRODDIR$SEARCHREPLACE
+            # rm $PRODDIR$SEARCHREPLACEINC
+            # SYNCITREMOTE
         fi
     elif [ $temp2 == "Y" ] ; then
         # second arg is the local environment
@@ -123,12 +133,25 @@ function deploy_database() {
     fi
 }
 
+# Make sure search replace exists
+function check_for_search_replace() {
+    if [ -e "./Search-Replace-DB-master/srdb.cli.php" ] && [ -e "./Search-Replace-DB-master/srdb.class.php" ] ; then
+        echo "Found search replace script."
+    else
+        echo "Downloading search replace script"
+        wget https://github.com/interconnectit/Search-Replace-DB/archive/master.zip
+        unzip ./master.zip
+        rm ./master.zip
+    fi
+}
+
 # Back up local db
 function backup_local_db() {
-    # back up local db
+    ### back up local db
     # create sql dir if not exist
     mkdir -p ./sql
     eval local backup_file_name=./sql/\${$ARG2[server_name]}-$(date +%Y%m%d_%H%M).sql
+    echo "Backing up: $backup_file_name"
     eval mysqldump -u \${$ARG2[db_user]} -p\${$ARG2[db_password]} -h \${$ARG2[sql_host]} \${$ARG2[db_name]} > $backup_file_name
 }
 
@@ -138,6 +161,7 @@ function backup_remote_db() {
     # create sql dir if not exist
     mkdir -p ./sql
     eval local backup_file_name=./sql/\${$ARG2[server_name]}-$(date +%Y%m%d_%H%M).sql
+    echo "Backing up: $backup_file_name"
     eval ssh \${$ARG2[user_name]}@\${$ARG2[server_name]} \"mysqldump -u \${$ARG2[db_user]} -p\${$ARG2[db_password]} -h \${$ARG2[sql_host]} \${$ARG2[db_name]}\" > $backup_file_name
 }
 
