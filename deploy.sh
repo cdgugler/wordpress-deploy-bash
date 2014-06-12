@@ -78,12 +78,14 @@ function deploy_files() {
     eval temp2=\${$ARG2[development]}
 
     if [ $temp == "Y" ] ; then
+        # ARG1 is local environment
         if [ "$DEPLOY_DRY_RUN" = true ] ; then
             eval rsync --dry-run -arvus --progress \${$ARG1[directory]} \${$ARG2[user_name]}@\${$ARG2[server_name]}:\${$ARG2[directory]} \${$ARG1[exclude]}
         else
             eval rsync -arvus --progress \${$ARG1[directory]} \${$ARG2[user_name]}@\${$ARG2[server_name]}:\${$ARG2[directory]} \${$ARG1[exclude]}
         fi
     elif [ $temp2 == "Y" ] ; then
+        # ARG2 is local environment
         if [ "$DEPLOY_DRY_RUN" = true ] ; then
             eval rsync --dry-run -arvus --progress \${$ARG1[user_name]}@\${$ARG1[server_name]}:\${$ARG1[directory]} \${$ARG2[directory]} \${$ARG1[exclude]}
         else
@@ -108,21 +110,27 @@ function deploy_database() {
         if [ "$DEPLOY_DRY_RUN" = true ] ; then
             backup_remote_db
         else
-            backup_remote_db
-            eval mysqldump -u \${$ARG1[db_user]} -p\${$ARG1[db_password]} \${$ARG1[db_name]} | ssh \${$ARG2[user_name]}@\${$ARG2[server_name]} \"mysql -u \${$ARG2[db_user]} -p\${$ARG2[db_password]} -h \${$ARG2[sql_host]} \${$ARG2[db_name]}\"
-            check_for_search_replace
-            scp ./Search-Replace-DB-master/srdb.cli.php ./Search-Replace-DB-master/srdb.class.php \${$ARG2[user_name]}@\${$ARG2[server_name]}:\${$ARG2[directory]}
-            eval echo "Running Search replace on \${$ARG2[server_name]}"
             eval local remote_user=\${$ARG2[user_name]}
             eval local remote_server=\${$ARG2[server_name]}
             eval local remote_dir=\${$ARG2[directory]}
-            eval local search_replace="Search-Replace-DB-master/srdb.cli.php"
-            eval local search_replace_inc="Search-Replace-DB-master/srdb.class.php"
             eval local remote_sql_host=\${$ARG2[sql_host]}
             eval local remote_db_user=\${$ARG2[db_user]}
             eval local remote_db_pass=\${$ARG2[db_password]}
             eval local remote_db_name=\${$ARG2[db_name]}
+            eval local remote_db_host=\${$ARG2[sql_host]}
             eval local local_server=\${$ARG1[server_name]}
+            eval local local_db_user=\${$ARG1[db_user]}
+            eval local local_db_password=\${$ARG1[db_password]}
+            eval local local_db_name=\${$ARG1[db_name]}
+
+            eval local search_replace="srdb.cli.php"
+            eval local search_replace_inc="srdb.class.php"
+
+            backup_remote_db
+            mysqldump -u $local_db_user -p$local_db_password $local_db_name | ssh $remote_user@$remote_server "mysql -u $remote_db_user -p$remote_db_pass -h $remote_db_host $remote_db_name"
+            check_for_search_replace
+            scp ./Search-Replace-DB-master/srdb.cli.php ./Search-Replace-DB-master/srdb.class.php $remote_user@$remote_server:$remote_dir
+            eval echo "Running Search replace on \${$ARG2[server_name]}"
 
             # Send a heredoc
             ssh $remote_user@$remote_server <<-EOF
@@ -206,7 +214,6 @@ function check_dry_run() {
     fi
 }
 
-
 # Ask for confirmation if not deploying silently
 function deploy_silent() {
     if [ "$DEPLOY_SILENT" != true ] ; then
@@ -236,38 +243,38 @@ function check_for_servers() {
 }
 
 # Start script
-if [[ "$1" =~ ^((-{1,2})([Hh]$|[Hh][Ee][Ll][Pp])|)$ ]]; then
-    print_usage ; exit 1
-else
-    # Parse arguments
-    while getopts ":afdns" opt; do
-        case $opt in
-            a)  add_environment ;;
-            f)  DEPLOY_FILES=true ;;
-            d)  DEPLOY_DATABASE=true ;;
-            n)  DEPLOY_DRY_RUN=true ;;
-            s)  DEPLOY_SILENT=true ;;
-            \?) echo "Invalid option: -$OPTARG"
-                exit 1 ;;
-        esac
-    done
-    shift $(($OPTIND -1))
+    if [[ "$1" =~ ^((-{1,2})([Hh]$|[Hh][Ee][Ll][Pp])|)$ ]]; then
+        print_usage ; exit 1
+    else
+        # Parse arguments
+        while getopts ":afdns" opt; do
+            case $opt in
+                a)  add_environment ;;
+                f)  DEPLOY_FILES=true ;;
+                d)  DEPLOY_DATABASE=true ;;
+                n)  DEPLOY_DRY_RUN=true ;;
+                s)  DEPLOY_SILENT=true ;;
+                \?) echo "Invalid option: -$OPTARG"
+                    exit 1 ;;
+            esac
+        done
+        shift $(($OPTIND -1))
 
-    # convert args to uppercase
-    ARG1=${1^^}
-    ARG2=${2^^}
+        # convert args to uppercase
+        ARG1=${1^^}
+        ARG2=${2^^}
 
-    source ./deploy.cfg
-    # echo "FROM: " $ARG1
-    # echo "TO: " $ARG2
+        source ./deploy.cfg
+        # echo "FROM: " $ARG1
+        # echo "TO: " $ARG2
 
-    check_for_servers
+        check_for_servers
 
-    if [ "$DEPLOY_FILES" = true ] ; then
-        deploy_files
+        if [ "$DEPLOY_FILES" = true ] ; then
+            deploy_files
+        fi
+
+        if [ "$DEPLOY_DATABASE" = true ] ; then
+            deploy_database
+        fi
     fi
-
-    if [ "$DEPLOY_DATABASE" = true ] ; then
-        deploy_database
-    fi
-fi
