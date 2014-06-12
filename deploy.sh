@@ -134,7 +134,7 @@ function deploy_database() {
 
             # Send a heredoc
             ssh $remote_user@$remote_server <<-EOF
-				$remote_dir$search_replace -h $remote_sql_host -u $remote_db_user -p $remote_db_pass -n $remote_db_name -s "$local_server" -r "$remote_server"
+				php $remote_dir$search_replace -h $remote_sql_host -u $remote_db_user -p $remote_db_pass -n $remote_db_name -s "$local_server" -r "$remote_server"
 				rm $remote_dir$search_replace ; rm $remote_dir$search_replace_inc
 			EOF
         fi
@@ -165,7 +165,7 @@ function deploy_database() {
             check_for_search_replace
             cp ./Search-Replace-DB-master/srdb.cli.php ./Search-Replace-DB-master/srdb.class.php $local_dir
 
-            ${local_dir}srdb.cli.php -h $local_sql_host -u $local_db_user -p $local_db_pass -n $local_db_name -s "$remote_server" -r "$local_server"
+            php ${local_dir}srdb.cli.php -h $local_sql_host -u $local_db_user -p $local_db_pass -n $local_db_name -s "$remote_server" -r "$local_server"
             rm ${local_dir}srdb.cli.php
             rm ${local_dir}srdb.class.php
         fi
