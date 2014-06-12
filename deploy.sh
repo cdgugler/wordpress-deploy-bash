@@ -184,6 +184,7 @@ function check_for_search_replace() {
         wget https://github.com/interconnectit/Search-Replace-DB/archive/master.zip
         unzip ./master.zip
         rm ./master.zip
+        chmod ug+x ./Search-Replace-DB-master/srdb.cli.php
     fi
 }
 
