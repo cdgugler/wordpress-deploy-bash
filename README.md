@@ -13,8 +13,11 @@ Run ./deploy.sh -a to add environments to the deploy.cfg file. Be sure to answer
 You must sync from a remote environment to a local environment or vice-versa. (No remote to remote sync).
 
 USAGE: deploy.sh <options> origin destination
+
 DESCRIPTION: Deploy files and/or database from origin environment to destination
+
 OPTIONS:
+
     -a  Add new environment         create new environment in deploy.cfg
     -f  Deploy files                push files from origin to destination
     -d  Deploy database             push db from origin to destination
@@ -23,13 +26,13 @@ OPTIONS:
 
 ## Status
 
-Currently undergoing a complete rewrite.
-Version 1.0.0 - Complete rewrite.
-Ver 0 - Rough stuff
+- Version 1.0.0 - Complete rewrite.
+- Ver 0 - Rough stuff
+
 
 ## Troubleshooting
 
-### I ran this script and it corrupted my wordpress install, stole my car, and punched me in ear.
+#### I ran this script and it corrupted my wordpress install, stole my car, and punched me in ear.
 
 I'm sorry to hear that! You did make backups though, right? Restore your backup, call your insurance company and put some ice on that ear!
 
