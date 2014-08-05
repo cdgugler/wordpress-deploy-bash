@@ -23,15 +23,14 @@ OPTIONS:
 
 ## Status
 
-Currently undergoing a complete rewrite.
 Version 1.0.0 - Complete rewrite.
 Ver 0 - Rough stuff
 
 ## Troubleshooting
 
-### I ran this script and it corrupted my wordpress install, stole my car, and punched me in ear.
+### I ran this script and it corrupted my wordpress install, stole my car, and punched me in eye.
 
-I'm sorry to hear that! You did make backups though, right? Restore your backup, call your insurance company and put some ice on that ear!
+I'm sorry to hear that! You did make backups though, right? Restore your backup, call your insurance company and put some ice on that eye.
 
 ## License
 
